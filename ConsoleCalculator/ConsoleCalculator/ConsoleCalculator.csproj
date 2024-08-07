@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">  
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings> 
+  <UseWindowsForms>true</UseWindowsForms> 
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+     <Reference Include="System.Windows.Forms">
+    <HintPath>C:\Users\Legion\source\repos\ConsoleCalculator\ConsoleCalculator\bin\Debug\net6.0\System.Windows.Forms.dll</HintPath>
+  </Reference>
+  </ItemGroup>
+
+</Project> 
+

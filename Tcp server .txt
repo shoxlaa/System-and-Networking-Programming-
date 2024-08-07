@@ -1,0 +1,88 @@
+class T
+{
+    public ManualResetEvent @event = new ManualResetEvent(false);
+    public TcpListener Server { get; set; }
+    public TcpClient Client { get; set; }
+    public NetworkStream NetworkStream { get; set; }
+    public StreamReader StreamReader { get; set; }
+    public StreamWriter StreamWriter { get; set; }
+    public ConcurrentBag<TcpClient> tcpClients { get; set; }
+    public string Message { get; set; }
+
+
+    public T(string ipAdress, int port)
+    {
+        Server = new(IPAddress.Parse(ipAdress), port);
+        tcpClients = new();
+    }
+    public string Read()
+    {
+        try
+        {
+            var l = StreamReader.ReadLine();
+            return l;
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+    public void Write(string message)
+    {
+        StreamWriter.WriteLine(message);
+    }
+    public void Start()
+    {
+
+        Server.Start();
+        Console.WriteLine("Starting server...");
+        Console.WriteLine("Server started!");
+        try
+        {
+            while (true)
+            {
+                Console.WriteLine("Waiting for a client...");
+                Client = Server.AcceptTcpClient();
+                Console.WriteLine("Client accepted!");
+                tcpClients.Add(Client);
+
+                //if (!tcpClients.TryTake(out TcpClient? client))
+                //{
+                //    return;
+                //}
+
+                foreach (var c in tcpClients)
+                {
+                    Task.Factory.StartNew(() =>
+                    {
+                        while (true)
+                        {
+
+                            NetworkStream = c.GetStream();
+                            StreamWriter = new(NetworkStream) { AutoFlush = true };
+                            StreamReader = new(NetworkStream);
+                            Message = Read(); 
+                            if(Message==null)
+                            {
+                                return;
+                            }
+                            Console.WriteLine(Message);
+                        }
+                    });
+                }
+
+
+            }
+
+        }
+        catch (Exception ex) when (ex is SocketException or ObjectDisposedException)
+        {
+            global::System.Console.WriteLine("Client disconnected");
+        }
+        finally
+        {
+            Client.Dispose();
+        }
+    }
+}
+
